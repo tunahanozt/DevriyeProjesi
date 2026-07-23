@@ -1,0 +1,17 @@
+CREATE TABLE DevriyeLog (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nfcUid TEXT NOT NULL,
+    okumaZamani TEXT NOT NULL,
+    sicilNo TEXT NOT NULL,
+    senkronizeEdildi INTEGER NOT NULL DEFAULT 0
+);
+
+tumKayitlariGetir:
+SELECT * FROM DevriyeLog WHERE senkronizeEdildi = 0;
+
+kayitEkle:
+INSERT INTO DevriyeLog(nfcUid, okumaZamani, sicilNo, senkronizeEdildi)
+VALUES (?, ?, ?, 0);
+
+durumGuncelle:
+UPDATE DevriyeLog SET senkronizeEdildi = 1 WHERE id = ?;

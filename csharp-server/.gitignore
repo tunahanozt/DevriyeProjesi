@@ -1,0 +1,25 @@
+# Visual Studio dizinleri ve dosyaları
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Derleme çıktıları (Build artifacts)
+bin/
+obj/
+[Bb]in/
+[Oo]bj/
+
+# Kullanıcıya özel ayarlar ve veritabanları (hassas veriler)
+appsettings.Development.json
+appsettings.json
+*.db
+*.db-journal
+
+# İşletim sistemi kalıntıları
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store

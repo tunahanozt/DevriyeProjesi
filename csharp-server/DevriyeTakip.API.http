@@ -1,0 +1,6 @@
+@DevriyeTakip.API_HostAddress = http://localhost:5212
+
+GET {{DevriyeTakip.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
