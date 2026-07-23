@@ -8,7 +8,7 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// API Controller'lar�n� projeye dahil eder
+// API Controller'larını projeye dahil eder
 builder.Services.AddControllers();
 
 builder.Services.AddSignalR();
@@ -28,19 +28,28 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+// Repository kayıtları (Dependency Injection)
 builder.Services.AddScoped<ICheckpointRepository, CheckpointRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
-// SQL Server Veritaban� Ba�lant�m�z� Sisteme Tan�t�yoruz
+// SQL Server veritabanı bağlantısını sisteme tanıtıyoruz
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-// ... (dosyan�n geri kalan� Swagger ayarlar� vs. ile devam eder)
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+// Uygulama açılışında veritabanını en güncel migration'a taşı ve
+// başlangıç verilerini (rol + test kullanıcısı) ekle.
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();
+    DbSeeder.Seed(db);
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

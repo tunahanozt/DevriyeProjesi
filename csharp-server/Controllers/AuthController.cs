@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using DevriyeTakip.API.Models;
+using DevriyeTakip.API.Repositories;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -11,10 +13,12 @@ namespace DevriyeTakip.API.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IConfiguration _configuration;
+        private readonly IUserRepository _userRepository;
 
-        public AuthController(IConfiguration configuration)
+        public AuthController(IConfiguration configuration, IUserRepository userRepository)
         {
             _configuration = configuration;
+            _userRepository = userRepository;
         }
 
         // Basit bir DTO (Data Transfer Object) modeli
@@ -25,36 +29,48 @@ namespace DevriyeTakip.API.Controllers
         }
 
         [HttpPost("login")]
-        public IActionResult Login([FromBody] LoginRequest request)
+        public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            // İlerleyen aşamalarda burada veritabanına bağlanıp kullanıcının şifresini kontrol edeceğiz.
-            // Şimdilik sistemin çalıştığını görmek için statik bir kontrol yapıyoruz.
-            if (request.SicilNo == "12345" && request.Sifre == "password123")
+            // Sicil numarasına göre kullanıcıyı veritabanından bul
+            var user = await _userRepository.GetBySicilNoAsync(request.SicilNo);
+
+            // Kullanıcı yoksa veya pasif durumdaysa girişi reddet
+            if (user is null || !user.IsActive)
             {
-                var token = GenerateJwtToken(request.SicilNo);
-                return Ok(new { token = token });
+                return Unauthorized(new { mesaj = "Hatalı sicil numarası veya şifre." });
             }
 
-            return Unauthorized(new { mesaj = "Hatalı sicil numarası veya şifre." });
+            // Gelen düz şifreyi, veritabanındaki hash ile güvenli şekilde karşılaştır
+            bool sifreDogruMu = BCrypt.Net.BCrypt.Verify(request.Sifre, user.PasswordHash);
+            if (!sifreDogruMu)
+            {
+                return Unauthorized(new { mesaj = "Hatalı sicil numarası veya şifre." });
+            }
+
+            var token = GenerateJwtToken(user);
+            return Ok(new { token });
         }
 
-        private string GenerateJwtToken(string sicilNo)
+        private string GenerateJwtToken(User user)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-            var claims = new[]
+            var claims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Sub, sicilNo),
+                // Sub: token'ın sahibi olan kullanıcının kimliği (Id)
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(ClaimTypes.Role, "Saha_Guvenlik") // İleride yetki bazlı işlemler için
+                new Claim("sicilNo", user.RegistrationNumber),
+                // Rol bazlı yetkilendirme için (örn: [Authorize(Roles = "Yonetici")])
+                new Claim(ClaimTypes.Role, user.Role?.RoleName ?? "Bilinmiyor")
             };
 
             var token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],
                 audience: _configuration["Jwt:Audience"],
                 claims: claims,
-                expires: DateTime.Now.AddHours(8), // Token'ın geçerlilik süresi (Örn: 8 Saatlik Vardiya)
+                expires: DateTime.UtcNow.AddHours(8), // Token geçerlilik süresi (8 saatlik vardiya)
                 signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);

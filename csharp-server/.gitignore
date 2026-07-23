@@ -12,8 +12,10 @@ obj/
 [Oo]bj/
 
 # Kullanıcıya özel ayarlar ve veritabanları (hassas veriler)
+# NOT: appsettings.json artık takip ediliyor ki proje klonlanınca doğrudan çalışsın.
+# Yalnızca makineye/ortama özel override dosyaları hariç tutulur.
 appsettings.Development.json
-appsettings.json
+appsettings.Local.json
 *.db
 *.db-journal
 
