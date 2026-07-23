@@ -17,7 +17,7 @@ class DevriyeRepository(driverFactory: DatabaseDriverFactory) {
 
     // 2. İnternet geldiğinde sunucuya gönderilecek bekleyen kayıtları getirme
     fun senkronizeEdilmeyenleriGetir(): List<DevriyeLog> {
-        return dbQuery.tumKayitlariGetir().executeAsList()
+        return queries.tumKayitlariGetir().executeAsList()
     }
 
     // 3. Sunucuya başarıyla iletilen kaydın durumunu güncelleme

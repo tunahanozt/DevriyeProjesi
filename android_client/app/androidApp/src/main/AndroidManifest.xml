@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application
-        android:name=".DevriyeApplication"
+        android:name="com.garoz.devriyemobil.android.DevriyeApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -12,7 +12,7 @@
         android:theme="@android:style/Theme.Material.Light.NoActionBar">
         <activity
             android:exported="true"
-            android:name=".MainActivity">
+            android:name="com.garoz.devriyemobil.android.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

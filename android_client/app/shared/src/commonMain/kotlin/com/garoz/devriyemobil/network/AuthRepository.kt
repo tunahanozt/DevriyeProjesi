@@ -15,7 +15,7 @@ class AuthRepository(private val httpClient: HttpClient) {
 
     suspend fun login(sicilNo: String, sifre: String): Result<String> {
         return try {
-            val response = httpClient.post("$baseUrl/login") { // C# tarafındaki [HttpPost("login")]
+            val response = httpClient.post("$baseUrl/Auth/login") { // C# tarafı: AuthController [HttpPost("login")] => /api/Auth/login
                 contentType(ContentType.Application.Json)
                 setBody(LoginRequest(sicilNo = sicilNo, sifre = sifre))
             }

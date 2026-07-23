@@ -3,7 +3,6 @@ package com.garoz.devriyemobil.ui
 import com.garoz.devriyemobil.network.AuthRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,7 +16,7 @@ class LoginViewModel(private val repository: AuthRepository) {
     fun login(sicilNo: String, sifre: String) {
         _uiState.value = LoginState.Loading // UI'a yükleniyor animasyonu göster talimatı
 
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.Default).launch {
             val result = repository.login(sicilNo, sifre)
 
             result.fold(

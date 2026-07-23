@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import com.garoz.devriyemobil.App
 import com.garoz.devriyemobil.android.nfc.NfcManager
 
 class MainActivity : ComponentActivity() {
@@ -14,23 +15,14 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val workConstraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED) // Sadece cihaz internete bağlıyken çalışır
-            .build()
+        // TODO (Aşama 3 - Offline Senkronizasyon):
+        // Periyodik WorkManager senkronizasyonu (DevriyeSyncWorker) buradan
+        // DevriyeApplication'a taşınacak. WorkManager bağımlılığı shared/androidMain'de
+        // olduğu için kurulumun orada yapılması gerekiyor.
 
-        val syncRequest = PeriodicWorkRequestBuilder<DevriyeSyncWorker>(15, TimeUnit.MINUTES)
-            .setConstraints(workConstraints)
-            .build()
-
-        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
-            "OfflineDevriyeSync",
-            ExistingPeriodicWorkPolicy.KEEP, // Mevcut bir görev varsa onu bozma
-            syncRequest
-        )
-
-        // Modülü başlat ve okunan UID'yi dinle
+        // NFC modülünü başlat ve okunan UID'yi dinle
         nfcManager = NfcManager(this) { nfcUid ->
-            // Modüler mimari: İleride bu UID doğrudan ViewModel'e veya DevriyeRepository'ye aktarılacak
+            // TODO (Aşama 2): UID doğrudan DevriyeKayitUseCase'e aktarılacak (şimdilik bilgi amaçlı)
             Toast.makeText(this, "NFC Okundu UID: $nfcUid", Toast.LENGTH_SHORT).show()
         }
 
@@ -38,12 +30,13 @@ class MainActivity : ComponentActivity() {
             Toast.makeText(this, "Bu cihazda NFC özelliği bulunmuyor!", Toast.LENGTH_LONG).show()
         }
 
+        // Compose arayüzünü göster (Login ekranı shared modüldeki App() içinde)
         setContent {
-            // Compose UI
+            App()
         }
     }
 
-    // Sadece delegasyon (yönlendirme) yapıyoruz
+    // NFC dinlemesini Activity yaşam döngüsüne bağlıyoruz
     override fun onResume() {
         super.onResume()
         nfcManager.enableForegroundDispatch()
