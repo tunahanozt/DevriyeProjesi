@@ -6,7 +6,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import com.garoz.devriyemobil.ui.HomeScreen
+import com.garoz.devriyemobil.network.SessionManager
+import com.garoz.devriyemobil.ui.DevriyeScreen
+import com.garoz.devriyemobil.ui.DevriyeViewModel
 import com.garoz.devriyemobil.ui.LoginScreen
 import com.garoz.devriyemobil.ui.LoginViewModel
 import org.koin.compose.koinInject
@@ -14,7 +16,7 @@ import org.koin.compose.koinInject
 @Composable
 fun App() {
     MaterialTheme {
-        // Basit oturum durumu: token null ise Login ekranı, doluysa ana ekran gösterilir.
+        val session = koinInject<SessionManager>()
         var token by remember { mutableStateOf<String?>(null) }
 
         if (token == null) {
@@ -24,13 +26,19 @@ fun App() {
             LoginScreen(
                 viewModel = loginViewModel,
                 onLoginSuccess = { alinanToken ->
-                    println("Giriş Başarılı! Alınan Token: $alinanToken")
-                    token = alinanToken // Ana ekrana geçişi tetikler
+                    session.token = alinanToken   // Kimlik doğrulamalı istekler token'ı buradan okur
+                    token = alinanToken           // Devriye ekranına geçişi tetikler
                 }
             )
         } else {
-            HomeScreen(
-                onLogout = { token = null } // Çıkış yapınca tekrar giriş ekranına dön
+            val devriyeViewModel = koinInject<DevriyeViewModel>()
+
+            DevriyeScreen(
+                viewModel = devriyeViewModel,
+                onLogout = {
+                    session.token = null
+                    token = null
+                }
             )
         }
     }
