@@ -13,6 +13,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -98,9 +99,11 @@ fun LoginScreen(
                 }
             }
             is LoginState.Success -> {
-                // Token alındı, bu ekranı kapatıp asıl ekrana geç
+                // Token alındı; composition sırasında değil, yan etki olarak üst ekrana bildir
                 val token = (uiState as LoginState.Success).token
-                onLoginSuccess(token)
+                LaunchedEffect(token) {
+                    onLoginSuccess(token)
+                }
             }
         }
     }
