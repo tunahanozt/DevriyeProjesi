@@ -13,6 +13,13 @@
         // Fiziksel etiketin donanım ID'si. Mobil uygulamadan okuyacağımız değer tam olarak bu!
         public string NfcUID { get; set; } = string.Empty;
 
+        // GPS konumu (Faz 4'te okutma sırasında konum doğrulaması için kullanılacak)
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
+
+        // Noktanın açıklaması/tarifi (örn: "A Blok arka kapı")
+        public string? Description { get; set; }
+
         public bool IsActive { get; set; } = true;
     }
 }

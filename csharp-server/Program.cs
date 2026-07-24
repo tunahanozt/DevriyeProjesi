@@ -1,6 +1,7 @@
 using DevriyeTakip.API.Data;
 using DevriyeTakip.API.Hubs;
 using DevriyeTakip.API.Repositories;
+using DevriyeTakip.API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -31,6 +32,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 // Repository kayıtları (Dependency Injection)
 builder.Services.AddScoped<ICheckpointRepository, CheckpointRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+// Faz 1 - Devriye domaini servis kayıtları
+builder.Services.AddScoped<IRouteService, RouteService>();
+builder.Services.AddScoped<IPatrolService, PatrolService>();
 
 // SQL Server veritabanı bağlantısını sisteme tanıtıyoruz
 builder.Services.AddDbContext<AppDbContext>(options =>

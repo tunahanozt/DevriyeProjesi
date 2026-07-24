@@ -24,5 +24,12 @@ namespace DevriyeTakip.API.Repositories
             return await _context.Checkpoints
                 .FirstOrDefaultAsync(c => c.NfcUID == nfcUid && c.IsActive);
         }
+
+        public async Task<Checkpoint> AddAsync(Checkpoint checkpoint)
+        {
+            _context.Checkpoints.Add(checkpoint);
+            await _context.SaveChangesAsync();
+            return checkpoint;
+        }
     }
 }

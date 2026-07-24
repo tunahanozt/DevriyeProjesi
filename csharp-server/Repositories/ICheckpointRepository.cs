@@ -9,5 +9,8 @@ namespace DevriyeTakip.API.Repositories
 
         // Mobil uygulama için UID'ye göre aktif noktayı bulan metodun kontratı
         Task<Checkpoint?> GetActiveByUidAsync(string nfcUid);
+
+        // Yönetici: yeni kontrol noktası ekler
+        Task<Checkpoint> AddAsync(Checkpoint checkpoint);
     }
 }

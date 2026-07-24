@@ -7,6 +7,7 @@ namespace DevriyeTakip.API.Models
         public int Id { get; set; }
         public int UserId { get; set; } // Hangi görevli bildirdi?
         public int? CheckpointId { get; set; } // Belirli bir noktadaysa ID'sini tutarız (Nullable)
+        public int? PatrolId { get; set; } // Hangi devriye sırasında bildirildi (opsiyonel)
 
         public string IssueType { get; set; } = string.Empty; // Örn: "Su Baskını"
         public string Description { get; set; } = string.Empty;
