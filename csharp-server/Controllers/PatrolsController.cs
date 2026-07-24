@@ -2,6 +2,7 @@ using DevriyeTakip.API.Dtos;
 using DevriyeTakip.API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace DevriyeTakip.API.Controllers
 {
@@ -24,10 +25,21 @@ namespace DevriyeTakip.API.Controllers
                 : Ok(patrol);
         }
 
-        // Personelin devriyelerini getirir
+        // Personelin devriyelerini getirir (yönetici/panel için)
         [HttpGet("user/{userId}")]
         public async Task<ActionResult<IEnumerable<PatrolDto>>> GetByUser(int userId)
             => Ok(await _patrolService.GetByUserAsync(userId));
+
+        // Giriş yapan personelin kendi devriyeleri (token'daki kimlikten)
+        [HttpGet("mine")]
+        public async Task<ActionResult<IEnumerable<PatrolDto>>> GetMine()
+        {
+            var idStr = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
+            if (!int.TryParse(idStr, out var userId))
+                return Unauthorized(new { mesaj = "Token'da kullanıcı kimliği bulunamadı." });
+
+            return Ok(await _patrolService.GetByUserAsync(userId));
+        }
 
         // Personel: devriyeyi başlatır
         [HttpPost("{id}/start")]
