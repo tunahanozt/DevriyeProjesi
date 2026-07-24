@@ -9,9 +9,11 @@ import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 
 class AuthRepository(private val httpClient: HttpClient) {
-    // Android emülatöründen bilgisayardaki C# (localhost) projesine erişmek için 10.0.2.2 kullanılır.
-    // Fiziksel telefonda test ederken buraya bilgisayarının yerel IP adresini (örn: 192.168.1.X) yazmalısın.
-    private val baseUrl = "http://10.0.2.2:5212/api"
+    // USB kablo (adb reverse) VEYA emülatör için 127.0.0.1 kullanılır.
+    // Kabloyla test: terminalde bir kez ->  adb reverse tcp:5212 tcp:5212
+    //   (telefonun localhost'unu PC'nin localhost'una USB üzerinden tünelller)
+    // WiFi ile fiziksel telefon kullanacaksan burayı PC'nin yerel IP'si yap: http://192.168.1.X:5212/api
+    private val baseUrl = "http://127.0.0.1:5212/api"
 
     suspend fun login(sicilNo: String, sifre: String): Result<String> {
         return try {
